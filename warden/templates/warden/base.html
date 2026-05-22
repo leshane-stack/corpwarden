@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}CorpWarden — Corporate Accountability Intelligence{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}Track workplace violations, enforcement events, and accountability history across major organizations. Evidence-based corporate accountability intelligence.{% endblock %}">
+    <link rel="canonical" href="{% block canonical %}https://corpwarden.com/{% endblock %}">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="{% block og_title %}CorpWarden — Corporate Accountability Intelligence{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}Track workplace violations, enforcement events, and accountability history across major organizations.{% endblock %}">
+    <meta property="og:type" content="{% block og_type %}website{% endblock %}">
+    <meta property="og:url" content="{% block og_url %}https://corpwarden.com/{% endblock %}">
+    <meta property="og:site_name" content="CorpWarden">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="{% block tw_title %}CorpWarden{% endblock %}">
+    <meta name="twitter:description" content="{% block tw_description %}Corporate accountability intelligence. Evidence-based enforcement tracking.{% endblock %}">
+
+    <!-- JSON-LD Organization -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "CorpWarden",
+        "url": "https://corpwarden.com",
+        "description": "Corporate accountability intelligence platform tracking workplace violations, enforcement events, and accountability history.",
+        "sameAs": []
+    }
+    </script>
+
+    {% block schema %}{% endblock %}
+
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0B1020;
+            --surface: #111827;
+            --surface-raised: #161F2E;
+            --text: #E8E6E3;
+            --text-secondary: #8B8D93;
+            --border: rgba(255,255,255,0.08);
+            --accent: #D4A24C;
+            --accent-dim: rgba(212, 162, 76, 0.15);
+            --link: #7BA7D4;
+            --mono: 'IBM Plex Mono', monospace;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Georgia', 'Times New Roman', serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        header {
+            border-bottom: 1px solid var(--border);
+            padding: 20px 0;
+            margin-bottom: 40px;
+        }
+
+        header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .site-name {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: var(--accent);
+            text-decoration: none;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+
+        .site-tagline {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+
+        .header-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .header-links a {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            letter-spacing: 0.5px;
+        }
+
+        .header-links a:hover { color: var(--accent); }
+
+        .disclaimer {
+            font-size: 11px;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border);
+            padding: 20px 0;
+            margin-top: 60px;
+            line-height: 1.5;
+        }
+
+        a { color: var(--link); }
+
+        .section-label {
+            font-family: var(--mono);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+            font-weight: 500;
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div>
+                <a href="/" class="site-name">CorpWarden</a>
+                <div class="site-tagline">Corporate Accountability Intelligence</div>
+            </div>
+            <div class="header-links">
+                <a href="/">Companies</a>
+                <a href="/methodology/">Methodology</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="container">
+        <div class="disclaimer">
+            CorpWarden aggregates publicly available government enforcement data and public records.
+            This is not investment advice. All data points link to original government sources.
+            Classifications reflect publicly available records, not recommendations
+            to buy, sell, or hold securities.
+        </div>
+    </footer>
+</body>
+</html>

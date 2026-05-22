@@ -1,0 +1,207 @@
+{% extends "warden/base.html" %}
+{% block title %}CorpWarden — Corporate Accountability Intelligence{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hero {
+        text-align: center;
+        padding: 60px 0 20px;
+    }
+
+    .hero h1 {
+        font-size: 28px;
+        font-weight: 400;
+        margin-bottom: 10px;
+        letter-spacing: -0.5px;
+    }
+
+    .hero p {
+        font-size: 14px;
+        color: var(--text-secondary);
+        max-width: 480px;
+        margin: 0 auto 28px;
+    }
+
+    .search-box {
+        max-width: 520px;
+        margin: 0 auto 16px;
+        position: relative;
+    }
+
+    .search-box input {
+        width: 100%;
+        padding: 14px 20px;
+        font-size: 15px;
+        font-family: 'Georgia', serif;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        color: var(--text);
+        outline: none;
+    }
+
+    .search-box input::placeholder {
+        color: var(--text-secondary);
+    }
+
+    .search-box input:focus {
+        border-color: var(--accent);
+    }
+
+    .coverage-scope {
+        text-align: center;
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--text-secondary);
+        margin-bottom: 48px;
+        letter-spacing: 0.3px;
+    }
+
+    .coverage-scope span {
+        opacity: 0.4;
+        margin: 0 6px;
+    }
+
+    .company-list {
+        list-style: none;
+        border-top: 1px solid var(--border);
+    }
+
+    .company-list li {
+        border-bottom: 1px solid var(--border);
+        padding: 14px 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .company-list a {
+        text-decoration: none;
+        font-size: 16px;
+        color: var(--text);
+    }
+
+    .company-list a:hover { color: var(--accent); }
+
+    .company-event-count {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--text-secondary);
+        margin-left: 12px;
+    }
+
+    .risk-badge {
+        font-family: var(--mono);
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 3px 10px;
+        border-radius: 3px;
+        font-weight: 500;
+    }
+
+    .risk-elevated { background: var(--accent-dim); color: var(--accent); }
+    .risk-mixed { background: var(--accent-dim); color: var(--accent); }
+    .risk-limited { background: rgba(100, 180, 120, 0.12); color: #64B478; }
+    .risk-insufficient { background: rgba(139, 141, 147, 0.12); color: var(--text-secondary); }
+
+    .recent-events { margin-top: 48px; }
+
+    .event-item {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--accent);
+        border-radius: 6px;
+        padding: 14px 20px;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: flex-start;
+        gap: 16px;
+    }
+
+    .event-date {
+        font-family: var(--mono);
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        letter-spacing: 0.08em;
+        min-width: 70px;
+        padding-top: 2px;
+    }
+
+    .event-body { flex: 1; }
+
+    .event-title {
+        font-size: 14px;
+        color: var(--text);
+        line-height: 1.4;
+    }
+
+    .event-company {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--text-secondary);
+        text-decoration: none;
+    }
+
+    .event-company:hover { color: var(--accent); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <h1>Corporate Accountability Intelligence</h1>
+    <p>Search workplace violations, enforcement events, and accountability history across major organizations.</p>
+</div>
+
+<div class="search-box">
+    <input type="text" placeholder="Search company accountability records..." id="company-search" autocomplete="off">
+</div>
+
+<div class="coverage-scope">
+    OSHA enforcement <span>•</span> WARN notices <span>•</span> labor actions <span>•</span> public settlements
+</div>
+
+{% if companies %}
+<div class="section-label">Companies</div>
+<ul class="company-list" id="company-list">
+    {% for company in companies %}
+    <li data-name="{{ company.name|lower }}">
+        <div>
+            <a href="{% url 'company_detail' company.slug %}">{{ company.name }}</a>
+            <span class="company-event-count">{{ company.events.count }} events</span>
+        </div>
+        <span class="risk-badge risk-{{ company.risk_level }}">
+            {% if company.risk_level == 'elevated' %}High Enforcement Activity
+            {% elif company.risk_level == 'mixed' %}Mixed Record
+            {% elif company.risk_level == 'limited' %}Limited Activity
+            {% else %}Insufficient Data{% endif %}
+        </span>
+    </li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+{% if recent_events %}
+<div class="recent-events">
+    <div class="section-label">Recent Enforcement Events</div>
+    {% for event in recent_events %}
+    <div class="event-item">
+        <div class="event-date">{{ event.date|date:"M Y" }}</div>
+        <div class="event-body">
+            <div class="event-title">{{ event.title }}</div>
+            <a href="{% url 'company_detail' event.company.slug %}" class="event-company">{{ event.company.name }}</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<script>
+document.getElementById('company-search').addEventListener('input', function(e) {
+    const q = e.target.value.toLowerCase();
+    document.querySelectorAll('#company-list li').forEach(function(li) {
+        li.style.display = li.dataset.name.includes(q) ? '' : 'none';
+    });
+});
+</script>
+{% endblock %}

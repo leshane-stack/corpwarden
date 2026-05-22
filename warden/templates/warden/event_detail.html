@@ -1,0 +1,291 @@
+{% extends "warden/base.html" %}
+{% block meta_description %}{{ event.title }} — {{ company.name }} accountability event tracked by CorpWarden.{% endblock %}
+{% block canonical %}https://corpwarden.com/company/{{ company.slug }}/event/{{ event.id }}/{% endblock %}
+{% block og_title %}{{ event.title }} | CorpWarden{% endblock %}
+{% block og_description %}{{ event.description|truncatechars:200 }}{% endblock %}
+{% block og_type %}article{% endblock %}
+{% block tw_title %}{{ event.title }}{% endblock %}
+{% block tw_description %}{{ event.description|truncatechars:200 }}{% endblock %}
+{% block schema %}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "{{ event.title }}",
+    "description": "{{ event.description|truncatechars:300 }}",
+    "datePublished": "{{ event.date|date:'Y-m-d' }}",
+    "publisher": {
+        "@type": "Organization",
+        "name": "CorpWarden",
+        "url": "https://corpwarden.com"
+    },
+    "about": {
+        "@type": "Organization",
+        "name": "{{ company.name }}"
+    }
+}
+</script>
+{% endblock %}
+{% block title %}{{ event.title }} — {{ company.name }} | CorpWarden{% endblock %}
+
+{% block extra_css %}
+<style>
+    .breadcrumb {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--text-secondary);
+        margin-bottom: 28px;
+    }
+
+    .breadcrumb a {
+        color: var(--text-secondary);
+        text-decoration: none;
+    }
+
+    .breadcrumb a:hover { color: var(--accent); }
+
+    .breadcrumb span { margin: 0 8px; opacity: 0.4; }
+
+    .event-header {
+        margin-bottom: 32px;
+    }
+
+    .event-type-badge {
+        display: inline-block;
+        font-family: var(--mono);
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: 500;
+        padding: 3px 10px;
+        border-radius: 3px;
+        background: var(--accent-dim);
+        color: var(--accent);
+        margin-bottom: 12px;
+    }
+
+    .event-header h1 {
+        font-size: 24px;
+        font-weight: 400;
+        line-height: 1.35;
+        margin-bottom: 8px;
+    }
+
+    .event-date {
+        font-family: var(--mono);
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        letter-spacing: 0.08em;
+    }
+
+    .event-summary {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 24px;
+        margin-bottom: 28px;
+        font-size: 15px;
+        line-height: 1.7;
+        color: var(--text);
+    }
+
+    /* Key Details */
+    .details-panel {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 24px;
+        margin-bottom: 28px;
+    }
+
+    .detail-row {
+        display: flex;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .detail-row:last-child { border-bottom: none; }
+
+    .detail-label {
+        font-family: var(--mono);
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-secondary);
+        min-width: 140px;
+        padding-top: 2px;
+    }
+
+    .detail-value {
+        font-size: 14px;
+        color: var(--text);
+    }
+
+    .detail-value a {
+        color: var(--link);
+        text-decoration: none;
+    }
+
+    .detail-value a:hover { text-decoration: underline; }
+
+    .penalty-badge {
+        display: inline-block;
+        font-family: var(--mono);
+        font-size: 13px;
+        font-weight: 500;
+        padding: 3px 12px;
+        border-radius: 3px;
+        background: var(--accent-dim);
+        color: var(--accent);
+    }
+
+    /* Source */
+    .source-panel {
+        background: var(--accent-dim);
+        border: 1px solid rgba(212, 162, 76, 0.25);
+        border-left: 3px solid var(--accent);
+        border-radius: 6px;
+        padding: 20px 24px;
+        margin-bottom: 32px;
+    }
+
+    .source-panel .section-label {
+        color: var(--accent);
+        margin-bottom: 8px;
+    }
+
+    .source-panel a {
+        color: var(--link);
+        text-decoration: none;
+        font-size: 14px;
+        word-break: break-all;
+    }
+
+    .source-panel a:hover { text-decoration: underline; }
+
+    .source-panel .source-note {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--text-secondary);
+        margin-top: 8px;
+    }
+
+    /* Related */
+    .related-events { margin-bottom: 40px; }
+
+    .related-item {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--accent);
+        border-radius: 6px;
+        padding: 14px 20px;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: flex-start;
+        gap: 16px;
+    }
+
+    .related-date {
+        font-family: var(--mono);
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        letter-spacing: 0.08em;
+        min-width: 70px;
+        padding-top: 2px;
+    }
+
+    .related-title {
+        font-size: 14px;
+        color: var(--text);
+        text-decoration: none;
+        line-height: 1.4;
+    }
+
+    .related-title:hover { color: var(--accent); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="breadcrumb">
+    <a href="/">Companies</a>
+    <span>/</span>
+    <a href="{% url 'company_detail' company.slug %}">{{ company.name }}</a>
+    <span>/</span>
+    Event
+</div>
+
+<div class="event-header">
+    <span class="event-type-badge">{{ event.get_domain_display }}</span>
+    <h1>{{ event.title }}</h1>
+    <div class="event-date">{{ event.date|date:"M j, Y" }}</div>
+</div>
+
+<div class="event-summary">
+    {{ event.description }}
+</div>
+
+<div class="details-panel">
+    <div class="section-label">Key Details</div>
+
+    <div class="detail-row">
+        <div class="detail-label">Agency</div>
+        <div class="detail-value">{{ event.source_agency }}</div>
+    </div>
+
+    <div class="detail-row">
+        <div class="detail-label">Date</div>
+        <div class="detail-value">{{ event.date|date:"F j, Y" }}</div>
+    </div>
+
+    <div class="detail-row">
+        <div class="detail-label">Severity</div>
+        <div class="detail-value">{{ event.get_severity_display }}</div>
+    </div>
+
+    {% if event.penalty_amount %}
+    <div class="detail-row">
+        <div class="detail-label">Penalty</div>
+        <div class="detail-value"><span class="penalty-badge">${{ event.penalty_amount|floatformat:0 }}</span></div>
+    </div>
+    {% endif %}
+
+    {% if event.facility_location %}
+    <div class="detail-row">
+        <div class="detail-label">Location</div>
+        <div class="detail-value">{{ event.facility_location }}</div>
+    </div>
+    {% endif %}
+
+    <div class="detail-row">
+        <div class="detail-label">Domain</div>
+        <div class="detail-value">{{ event.get_domain_display }}</div>
+    </div>
+
+    {% if event.source_document %}
+    <div class="detail-row">
+        <div class="detail-label">Document</div>
+        <div class="detail-value">{{ event.source_document }}</div>
+    </div>
+    {% endif %}
+</div>
+
+{% if event.source_url %}
+<div class="source-panel">
+    <div class="section-label">Primary Source</div>
+    <a href="{{ event.source_url }}" target="_blank" rel="noopener">{{ event.source_url }}</a>
+    <div class="source-note">Direct link to original government or public record</div>
+</div>
+{% endif %}
+
+{% if related_events %}
+<div class="related-events">
+    <div class="section-label">Related {{ company.name }} Events</div>
+    {% for rel in related_events %}
+    <div class="related-item">
+        <div class="related-date">{{ rel.date|date:"M Y" }}</div>
+        <a href="{% url 'event_detail' company.slug rel.id %}" class="related-title">{{ rel.title }}</a>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,397 @@
+{% extends "warden/base.html" %}
+{% block title %}{{ company.name }} — Workplace Accountability | CorpWarden{% endblock %}
+
+{% block extra_css %}
+<style>
+    .back-link {
+        display: inline-block;
+        margin-bottom: 24px;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--text-secondary);
+        text-decoration: none;
+    }
+    .back-link:hover { color: var(--accent); }
+
+    .company-header { margin-bottom: 32px; }
+
+    .company-header h1 {
+        font-size: 28px;
+        font-weight: 400;
+        margin-bottom: 4px;
+    }
+
+    .company-subtitle {
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        font-size: 14px;
+        color: var(--text-secondary);
+        margin-bottom: 14px;
+    }
+
+    .risk-banner {
+        display: inline-block;
+        font-family: var(--mono);
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        padding: 5px 14px;
+        border-radius: 3px;
+        font-weight: 500;
+        margin-bottom: 12px;
+        background: var(--accent-dim);
+        color: var(--accent);
+    }
+
+    .summary-line {
+        font-size: 15px;
+        color: var(--text-secondary);
+        margin-top: 8px;
+        max-width: 600px;
+        line-height: 1.6;
+    }
+
+    .event-count-meta {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--text-secondary);
+        margin-top: 12px;
+        letter-spacing: 0.3px;
+    }
+
+    /* Snapshot */
+    .snapshot {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 28px;
+        margin-bottom: 32px;
+    }
+
+    .stat-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 16px;
+    }
+
+    .stat-item {
+        padding: 16px;
+        background: var(--surface-raised);
+        border-radius: 6px;
+        border: 1px solid var(--border);
+    }
+
+    .stat-value {
+        font-size: 28px;
+        font-weight: 700;
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        line-height: 1.1;
+        color: var(--accent);
+    }
+
+    .stat-label {
+        font-size: 12px;
+        color: var(--text-secondary);
+        margin-top: 4px;
+    }
+
+    .stat-context {
+        font-family: var(--mono);
+        font-size: 10px;
+        color: var(--text-secondary);
+        margin-top: 6px;
+        opacity: 0.7;
+    }
+
+    /* Pattern */
+    .pattern-summary {
+        background: var(--accent-dim);
+        border: 1px solid rgba(212, 162, 76, 0.25);
+        border-left: 3px solid var(--accent);
+        border-radius: 6px;
+        padding: 20px 24px;
+        margin-bottom: 32px;
+    }
+
+    .pattern-summary .section-label {
+        color: var(--accent);
+        margin-bottom: 8px;
+    }
+
+    .pattern-summary p {
+        font-size: 14px;
+        color: var(--text);
+        line-height: 1.7;
+    }
+
+    /* Filters */
+    .timeline-filters {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+
+    .filter-btn {
+        font-family: var(--mono);
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 5px 14px;
+        border-radius: 4px;
+        border: 1px solid var(--border);
+        background: transparent;
+        color: var(--text-secondary);
+        cursor: pointer;
+        transition: all 0.15s;
+    }
+
+    .filter-btn:hover, .filter-btn.active {
+        background: var(--accent-dim);
+        border-color: var(--accent);
+        color: var(--accent);
+    }
+
+    /* Timeline */
+    .timeline { margin-bottom: 40px; }
+
+    .timeline-event {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--accent);
+        border-radius: 6px;
+        padding: 20px 24px;
+        margin-bottom: 10px;
+    }
+
+    .event-top-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+    }
+
+    .event-date {
+        font-family: var(--mono);
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        letter-spacing: 0.08em;
+    }
+
+    .event-type-badge {
+        font-family: var(--mono);
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: 500;
+        padding: 2px 8px;
+        border-radius: 3px;
+        background: var(--accent-dim);
+        color: var(--accent);
+    }
+
+    .event-title-link {
+        font-size: 1.2rem;
+        line-height: 1.35;
+        font-weight: 500;
+        margin-bottom: 8px;
+        color: var(--text);
+        text-decoration: none;
+        display: block;
+    }
+
+    .event-title-link:hover {
+        color: var(--accent);
+    }
+
+    .event-title {
+        font-size: 1.2rem;
+        line-height: 1.35;
+        font-weight: 500;
+        margin-bottom: 8px;
+        color: var(--text);
+    }
+
+    .event-description {
+        font-size: 13px;
+        color: var(--text-secondary);
+        margin-bottom: 10px;
+        line-height: 1.55;
+    }
+
+    .event-penalty {
+        display: inline-block;
+        font-family: var(--mono);
+        font-size: 12px;
+        font-weight: 500;
+        padding: 3px 10px;
+        border-radius: 3px;
+        background: var(--accent-dim);
+        color: var(--accent);
+        margin-bottom: 8px;
+    }
+
+    .event-meta {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--text-secondary);
+        letter-spacing: 0.02em;
+    }
+
+    .event-meta a {
+        color: var(--link);
+        text-decoration: none;
+    }
+
+    .event-meta a:hover { text-decoration: underline; }
+
+    /* Sources */
+    .sources-panel {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 24px;
+        margin-bottom: 40px;
+    }
+
+    .sources-subtitle {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--text-secondary);
+        margin-top: -10px;
+        margin-bottom: 16px;
+        letter-spacing: 0.3px;
+    }
+
+    .source-item {
+        padding: 10px 0;
+        border-bottom: 1px solid var(--border);
+        font-size: 14px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .source-item:last-child { border-bottom: none; }
+
+    .source-item a {
+        font-size: 12px;
+        color: var(--link);
+        text-decoration: none;
+    }
+
+    .source-checked {
+        font-family: var(--mono);
+        font-size: 10px;
+        color: var(--text-secondary);
+        white-space: nowrap;
+        margin-left: 16px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<a href="/" class="back-link">← All Companies</a>
+
+<div class="company-header">
+    <h1>{{ company.name }}</h1>
+    <div class="company-subtitle">
+        Workplace Accountability Record
+        {% if company.industry %} · {{ company.industry.name }}{% endif %}
+        {% if company.stock_ticker %} · {{ company.stock_ticker }}{% endif %}
+    </div>
+    <span class="risk-banner">
+        {% if company.risk_level == 'elevated' %}Significant Enforcement History
+        {% elif company.risk_level == 'mixed' %}Mixed Enforcement Record
+        {% elif company.risk_level == 'limited' %}Limited Enforcement Activity
+        {% else %}Insufficient Data{% endif %}
+    </span>
+    {% if company.pattern_summary %}
+    <p class="summary-line">{{ company.summary_line }}</p>
+    {% endif %}
+    <div class="event-count-meta">{{ events.count }} tracked accountability events since {{ events.last.date|date:"Y" }}</div>
+</div>
+
+{% if stats %}
+<div class="snapshot">
+    <div class="section-label">Accountability Snapshot</div>
+    <div class="stat-grid">
+        {% for stat in stats %}
+        <div class="stat-item">
+            <div class="stat-value">{{ stat.value }}</div>
+            <div class="stat-label">{{ stat.label }}</div>
+            {% if stat.context %}<div class="stat-context">{{ stat.context }}</div>{% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+{% if company.pattern_summary %}
+<div class="pattern-summary">
+    <div class="section-label">Observed Pattern</div>
+    <p>{{ company.pattern_summary }}</p>
+</div>
+{% endif %}
+
+{% if events %}
+<div class="timeline">
+    <div class="section-label">Accountability Timeline</div>
+
+    <div class="timeline-filters">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="workplace">OSHA</button>
+        <button class="filter-btn" data-filter="labor">WARN</button>
+        <button class="filter-btn" data-filter="labor">NLRB</button>
+        <button class="filter-btn" data-filter="workplace">Settlements</button>
+    </div>
+
+    {% for event in events %}
+    <div class="timeline-event" data-domain="{{ event.domain }}">
+        <div class="event-top-row">
+            <div class="event-date">{{ event.date|date:"M j, Y" }}</div>
+            <span class="event-type-badge">{{ event.get_domain_display }}</span>
+        </div>
+        <a href="{% url 'event_detail' company.slug event.id %}" class="event-title-link">{{ event.title }}</a>
+        <div class="event-description">{{ event.description }}</div>
+        {% if event.penalty_amount %}
+        <div class="event-penalty">${{ event.penalty_amount|floatformat:0 }} penalty</div>
+        {% endif %}
+        <div class="event-meta">
+            {{ event.source_agency }}
+            {% if event.facility_location %} · {{ event.facility_location }}{% endif %}
+            {% if event.source_url %} · <a href="{{ event.source_url }}" target="_blank" rel="noopener">View source →</a>{% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% if sources %}
+<div class="sources-panel">
+    <div class="section-label">Primary Sources</div>
+    <div class="sources-subtitle">Verified public records and government databases</div>
+    {% for source in sources %}
+    <div class="source-item">
+        <div>
+            {{ source.source_name }} — {{ source.source_agency }}
+            {% if source.source_url %}<br><a href="{{ source.source_url }}" target="_blank" rel="noopener">{{ source.source_url|truncatechars:60 }}</a>{% endif %}
+        </div>
+        <div class="source-checked">Checked {{ source.last_checked|date:"M j, Y" }}</div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<script>
+document.querySelectorAll('.filter-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        const filter = this.dataset.filter;
+        document.querySelectorAll('.timeline-event').forEach(function(ev) {
+            ev.style.display = (filter === 'all' || ev.dataset.domain === filter) ? '' : 'none';
+        });
+    });
+});
+</script>
+{% endblock %}

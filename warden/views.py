@@ -40,6 +40,6 @@ def robots_txt(request):
     lines = [
         "User-agent: *",
         "Allow: /",
-        "Sitemap: https://corpwarden.com/sitemap.xml",
+        "Sitemap: https://www.corpwarden.com/sitemap.xml",
     ]
     return HttpResponse("\n".join(lines), content_type="text/plain")

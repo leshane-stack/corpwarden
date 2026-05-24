@@ -3,7 +3,7 @@ from .models import Company, AccountabilityEvent
 
 
 def home(request):
-    companies = Company.objects.all().order_by('name')
+    companies = Company.objects.filter(events__isnull=False).distinct().order_by('name')
     recent_events = AccountabilityEvent.objects.select_related('company').order_by("-date")[:5]
     return render(request, 'warden/home.html', {
         'companies': companies,

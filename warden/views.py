@@ -1,10 +1,17 @@
 from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponse
+from django.db.models import Count
 from .models import Company, AccountabilityEvent
 
 
 def home(request):
-    companies = Company.objects.filter(events__isnull=False).distinct().order_by('name')
-    recent_events = AccountabilityEvent.objects.select_related('company').order_by("-date")[:5]
+    companies = (
+        Company.objects
+        .filter(events__isnull=False)
+        .annotate(event_count=Count('events'))
+        .order_by('-event_count')[:50]
+    )
+    recent_events = AccountabilityEvent.objects.select_related('company').order_by('-date')[:5]
     return render(request, 'warden/home.html', {
         'companies': companies,
         'recent_events': recent_events,
@@ -34,7 +41,6 @@ def event_detail(request, slug, event_id):
         'related_events': related_events,
     })
 
-from django.http import HttpResponse
 
 def robots_txt(request):
     lines = [
